@@ -1,19 +1,6 @@
-#include <stdio.h>
-#include <stdlib.h>
+# include "queue.h"
 
-struct QNode {
-    int value;
-    struct QNode *next;
-};
-
-struct Queue {
-    struct QNode *head;
-    struct QNode *tail;
-    int qlen;
-};
-
-
-struct Queue* create_queue()
+struct Queue* queue_create()
 {
     struct Queue *queue = (struct Queue*)malloc(sizeof(struct Queue));
     if(!queue)
@@ -27,14 +14,14 @@ struct Queue* create_queue()
 
 }
 
-int is_empty(struct Queue *queue)
+int queue_is_empty(struct Queue *queue)
 {
     return queue->qlen == 0;
 }
 
 int queue_peek(struct Queue *queue)
 {
-    if (is_empty(queue))
+    if (queue_is_empty(queue))
     {
         printf("Queue is empty.\n");
         return -1;
@@ -44,7 +31,7 @@ int queue_peek(struct Queue *queue)
 
 int queue_dequeue(struct Queue* queue)
 {
-    if (is_empty(queue))
+    if (queue_is_empty(queue))
     {
         printf("Queue is empty.\n");
         return -1;
@@ -69,7 +56,7 @@ int queue_enqueue(struct Queue *queue, int newval)
     node -> value = newval;
     node->next = NULL;
 
-    if (is_empty(queue))
+    if (queue_is_empty(queue))
     {
         queue->head = queue->tail = node;
     }
@@ -85,30 +72,9 @@ int queue_enqueue(struct Queue *queue, int newval)
 
 void free_queue(struct Queue *queue)
 {
-    while (!is_empty(queue))
+    while (!queue_is_empty(queue))
     {
         queue_dequeue(queue);
     }
     free(queue);
 }
-
-int main()
-{
-
-    struct Queue *queue = create_queue();
-    queue_enqueue(queue, 5);
-    printf("peeking: %i\n", queue_peek(queue));
-    queue_enqueue(queue, 6);
-    printf("peeking: %i\n", queue_peek(queue));
-    queue_enqueue(queue, 7);
-    printf("peeking: %i\n", queue_peek(queue));
-    queue_dequeue(queue);
-    printf("peeking: %i\n", queue_peek(queue));
-    queue_dequeue(queue);
-    printf("peeking: %i\n", queue_peek(queue));
-    queue_dequeue(queue);
-    printf("peeking: %i\n", queue_peek(queue));
-    queue_dequeue(queue);
-    printf("peeking: %i\n", queue_peek(queue));
-}
-
