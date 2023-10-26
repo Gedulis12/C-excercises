@@ -141,20 +141,21 @@ void mheap_insert(MinHeap *heap, int value)
 
 int mheap_delete(MinHeap *heap)
 {
+
     if (heap->len == 0)
     {
         return -1;
     }
 
     int out = heap->arr_l->data[0];
-    if (heap->len == 1)
+    heap->len--;
+
+    if (heap->len == 0)
     {
-        int out = heap->arr_l->data[0];
         arr_l_free(heap->arr_l);
         return out;
     }
 
-    heap->len--;
     heap->arr_l->data[0] = heap->arr_l->data[heap->len];
     mheap_heapify_down(heap, 0);
 
