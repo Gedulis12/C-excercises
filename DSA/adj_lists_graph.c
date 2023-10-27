@@ -2,6 +2,8 @@
 #include <stdlib.h>
 #include <stdbool.h>
 
+#define INF 9999
+
 typedef struct Node {
     int vertex;
     int weight;
@@ -128,6 +130,66 @@ int dfs(Graph *graph, int start, int needle)
     return result;
 }
 
+void dijkstra(Graph * graph, int source)
+{
+    int *distance = malloc(graph->num_vertices * sizeof(int));
+    int *pred = malloc(graph->num_vertices * sizeof(int));
+    int *visited = malloc(graph->num_vertices * sizeof(int));
+    int count, min_dist, next_node;
+
+    for (int i = 0; i < graph->num_vertices; i++)
+    {
+        distance[i] = INF;
+        pred[i] = -1;
+        visited[i] = 0;
+    }
+
+    distance[source] = 0;
+    count = 0;
+
+    while (count < graph->num_vertices)
+    {
+        min_dist = INF;
+
+        for (int i = 0; i < graph->num_vertices; i++)
+        {
+            if (distance[i] < min_dist && !visited[i])
+            {
+                min_dist = distance[i];
+                next_node = i;
+            }
+        }
+
+        visited[next_node] = 1;
+        Node * curr = graph->adj_lists[next_node];
+
+        while (curr != NULL)
+        {
+            int neighbor = curr->vertex;
+            int weight = curr->weight;
+
+            if (!visited[neighbor] && min_dist + weight < distance[neighbor])
+            {
+                distance[neighbor] = min_dist + weight;
+                pred[neighbor] = next_node;
+            }
+
+            curr = curr->next;
+        }
+        count++;
+    }
+        for (int i = 0; i < graph->num_vertices; i++) 
+        {
+        if (i != source) 
+            {
+                printf("Distance from %d to %d: %d\n", source, i, distance[i]);
+            }
+        }
+    free(distance);
+    free(pred);
+    free(visited);
+}
+
 int main()
 {
     Graph *graph = graph_create(5);
@@ -144,6 +206,8 @@ int main()
     int res_2 = dfs(graph, 4, 0);
     printf("TEST searching for vertice 4 starting from node 0. Expecting Found, result: %s\n", (res_1 == 1) ? "Found" : "Not found");
     printf("TEST searching for vertice 0 starting from node 4. Expecting Not Found, result: %s\n", (res_2 == 1) ? "Found" : "Not found");
+
+    dijkstra(graph, 1);
     graph_free(graph);
 
     return 0;

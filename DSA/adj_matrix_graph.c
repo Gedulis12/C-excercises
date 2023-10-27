@@ -2,6 +2,9 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+#define INF 9999
+
+
 typedef int** WeightedAdjecencyMatrix;
 
 typedef struct QNode {
@@ -35,6 +38,9 @@ void graph_print(Graph *graph);
 int graph_edge_add(Graph * graph, int from_node, int to_node, int weight);
 int graph_edge_has(Graph * graph, int from_node, int to_node);
 
+void dijkstra(Graph* graph, int source);
+
+
 int bfs(Graph *graph, int source, int needle);
 
 int main()
@@ -61,6 +67,7 @@ int main()
         printf("Needle %d not found starting from vertex %d\n", needle, source);
     }
 
+    dijkstra(g1, 1);
     graph_destroy(g1);
 }
 
@@ -275,3 +282,79 @@ int graph_edge_has(Graph *graph, int from_node, int to_node)
     return graph->edges[from_node][to_node];
 }
 
+void dijkstra(Graph* graph, int source)
+{
+    int **cost = malloc(graph->num_vertices * sizeof(int*));
+    int *distance = malloc(graph->num_vertices * sizeof(int*));
+    int *pred = malloc(graph->num_vertices * sizeof(int*));
+    int *visited = malloc(graph->num_vertices * sizeof(int*));
+    int count, min_dist, next_node;
+
+    for (int i = 0; i < graph->num_vertices; i++)
+    {
+        cost[i] = malloc(graph->num_vertices * sizeof(int));
+    }
+
+    // creating a cost matrix
+    for (int i = 0; i < graph->num_vertices; i++)
+    {
+        for (int j = 0; j < graph->num_vertices; j++)
+        {
+            if (graph->edges[i][j] == 0)
+            {
+                cost[i][j] = INF;
+            }
+            else
+            {
+                cost[i][j] = graph->edges[i][j];
+            }
+        }
+    }
+
+    for (int i = 0; i < graph->num_vertices; i++)
+    {
+        distance[i] = cost[source][i];
+        pred[i] = source;
+        visited[i] = 0;
+    }
+
+    distance[source] = 0;
+    visited[source] = 1;
+    count = 1;
+
+    while (count < graph->num_vertices-1)
+    {
+        min_dist = INF;
+
+        for (int i = 0; i < graph->num_vertices; i++)
+        {
+            if(distance[i] < min_dist && !visited[i])
+            {
+                min_dist = distance[i];
+                next_node = i;
+            }
+        }
+
+        visited[next_node] = 1;
+        for (int i = 0; i < graph->num_vertices; i++)
+        {
+            if (!visited[i])
+            {
+                if (min_dist + cost[next_node][i] < distance[i])
+                {
+                    distance[i] = min_dist + cost[next_node][i];
+                    pred[i] = next_node;
+                }
+            }
+        }
+        count++;
+    }
+    for (int i = 0; i < graph->num_vertices; i ++)
+    {
+        if (i != source)
+        {
+            printf("\nDistance from %d to %d: %d",source, i, distance[i]);
+        }
+    }
+    printf("\n");
+}
